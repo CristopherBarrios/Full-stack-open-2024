@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Button = ({manejo,text}) => <button onClick={manejo}>{text.boton}</button>
+const Button = ({manejo,text}) => <button onClick={manejo}>{text}</button>
 
 
 const App = () => {
@@ -14,22 +14,32 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
     'The only way to go fast, is to go well.'
   ]
-
-  const [selected, setSelected] = useState(0)
-
-  const handleAleatorio = () => {
-    setSelected(Math.floor(Math.random()  * ((anecdotes.length) - Math.ceil(0)+1) + Math.ceil(0)))
-  }
   
   const texto = {
-    boton: "next anecdote"
+    boton: "next anecdote",
+    votar: "vote",
+    tiene: "has",
+    votos: "votes"
+  }
+
+  const [selected, setSelected] = useState(0)
+  const [points, setPoints] = useState(Array(anecdotes.length + 1).fill(0))
+
+  const handleAleatorio = () => setSelected(Math.floor(Math.random() * ((anecdotes.length) - Math.ceil(0) + 1) + Math.ceil(0)))
+  const handleVote = () => {
+    const copy = [...points]
+    copy[selected] += 1
+    setPoints(copy)
   }
 
   return (
     <div>
       {anecdotes[selected]}
       <br/>
-      <Button manejo={handleAleatorio} text={texto}/>
+      {texto.tiene} {points[selected]} {texto.votos}
+      <br/>
+      <Button manejo={handleVote} text={texto.votar}/>
+      <Button manejo={handleAleatorio} text={texto.boton}/>
     </div>
   )
 }
