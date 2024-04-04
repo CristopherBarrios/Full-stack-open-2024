@@ -16,6 +16,8 @@ const App = () => {
   ]
   
   const texto = {
+    titulo: "Anecdote of the day",
+    titulo2: "Anecdote with most votes",
     boton: "next anecdote",
     votar: "vote",
     tiene: "has",
@@ -23,9 +25,10 @@ const App = () => {
   }
 
   const [selected, setSelected] = useState(0)
-  const [points, setPoints] = useState(Array(anecdotes.length + 1).fill(0))
+  const [points, setPoints] = useState(Array(anecdotes.length).fill(0))
+  const numeroMayor = points.indexOf(Math.max(...points))
 
-  const handleAleatorio = () => setSelected(Math.floor(Math.random() * ((anecdotes.length) - Math.ceil(0) + 1) + Math.ceil(0)))
+  const handleAleatorio = () => setSelected(Math.floor(Math.random() * ((anecdotes.length) - 0) + 0))
   const handleVote = () => {
     const copy = [...points]
     copy[selected] += 1
@@ -34,12 +37,17 @@ const App = () => {
 
   return (
     <div>
+      <h1>{texto.titulo}</h1>
       {anecdotes[selected]}
       <br/>
       {texto.tiene} {points[selected]} {texto.votos}
       <br/>
       <Button manejo={handleVote} text={texto.votar}/>
       <Button manejo={handleAleatorio} text={texto.boton}/>
+
+      <h1>{texto.titulo2}</h1>
+      <br/>
+      {anecdotes[numeroMayor]}
     </div>
   )
 }
