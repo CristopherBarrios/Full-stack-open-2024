@@ -16,13 +16,18 @@ const PersonForm  = ({addName,valueName,handleNewName,valueNumber,handleNewNumbe
   </form>
   )
 }
-const Persons = ({filteredPersons}) => {
-  return(
+const Persons = ({ filteredPersons, handleDelete }) => {
+  return (
     <>
-    {filteredPersons.map((person) => (<p key={person.id}>{person.name} {person.number}</p>))}
+      {filteredPersons.map((person) => (
+        <div key={person.id}>
+          <p>{person.name} {person.number}</p>
+          <button onClick={() => handleDelete(person.id,person.name)}>delete</button>
+        </div>
+      ))}
     </>
-    )}
-
+  )
+}
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -49,6 +54,19 @@ const App = () => {
     }
   };
 
+  const handleDelete = (id,name) => {
+
+    if (window.confirm(`Delete ${name}?`)) {
+      personsService
+      .eliminar(id)
+      .then(()  => {
+      setPersons(persons.filter(person => person.id !== id));
+      })
+
+    
+  }
+}
+
   const handleNewName = (event) => setNewName(event.target.value);
   const handleNewNumber = (event) => setNewNumber(event.target.value);
   const handleSearchTerm = (event) => setSearchTerm(event.target.value);
@@ -73,7 +91,7 @@ const App = () => {
 
 
       <h2>Numbers</h2>
-      <Persons filteredPersons={filteredPersons}/>
+      <Persons filteredPersons={filteredPersons} handleDelete={handleDelete}/>
 
     </div>
   );
