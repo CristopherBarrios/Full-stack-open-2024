@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import personsService from './services/persons'
 import axios from 'axios'
 // npx json-server --port 3001 --watch db.json
 // npm install axios
@@ -37,10 +38,10 @@ const App = () => {
     if (persons.some((person) => person.name === newName)) {
       alert(`${newName} is already added to the phonebook`);
     } else {
-      axios
-      .post('http://localhost:3001/persons', nameObject)
-      .then(response => {
-      setPersons(persons.concat(response.data));
+      personsService
+      .create(nameObject)
+      .then(initialPersones  => {
+      setPersons(persons.concat(initialPersones));
       })
       // setPersons(persons.concat(nameObject));
       setNewName('');
@@ -55,10 +56,10 @@ const App = () => {
   const filteredPersons = persons.filter((person) => person.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    personsService
+      .getAll()
+      .then(initialPersones => {
+        setPersons(initialPersones)
       })
   }, [])
 
