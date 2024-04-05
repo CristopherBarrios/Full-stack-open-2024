@@ -32,12 +32,17 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault();
-    const nameObject = { name: newName, number: newNumber, id: persons.length + 1 };
+    const nameObject = {  name: newName, number: newNumber, id: (persons.length + 1).toString() };
 
     if (persons.some((person) => person.name === newName)) {
       alert(`${newName} is already added to the phonebook`);
     } else {
-      setPersons(persons.concat(nameObject));
+      axios
+      .post('http://localhost:3001/persons', nameObject)
+      .then(response => {
+      setPersons(persons.concat(response.data));
+      })
+      // setPersons(persons.concat(nameObject));
       setNewName('');
       setNewNumber('');
     }
