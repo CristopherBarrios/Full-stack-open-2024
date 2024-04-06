@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import personsService from './services/persons'
-import axios from 'axios'
+import './index.css'
 // npx json-server --port 3001 --watch db.json
 // npm install axios
 // npm install json-server --save-dev
@@ -29,12 +29,25 @@ const Persons = ({ filteredPersons, handleDelete }) => {
   )
 }
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="error">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]);
 
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const addName = (event) => {
     event.preventDefault();
@@ -49,6 +62,14 @@ const App = () => {
         personsService
           .update(existingPerson.id, updatedPerson)
           .then(updatedPerson => {
+            setErrorMessage(
+              `Phone changed. name:'${nameObject.name}' number:  '${nameObject.number}'`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          setPersons(persons.concat(initialPersones));
+
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : updatedPerson));
             setNewName('');
             setNewNumber('');
@@ -61,6 +82,12 @@ const App = () => {
       personsService
       .create(nameObject)
       .then(initialPersones  => {
+        setErrorMessage(
+          `Added '${nameObject.name}' `
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       setPersons(persons.concat(initialPersones));
       })
       // setPersons(persons.concat(nameObject));
@@ -96,6 +123,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} />
       <Filter text={"filter shown with:"} value={searchTerm} change={handleSearchTerm}/>
       
       <h2>add a new</h2>
