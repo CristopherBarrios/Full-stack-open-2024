@@ -41,6 +41,17 @@ const Notification = ({ message }) => {
   )
 }
 
+const NotificationRed = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="errorred">
+      {message}
+    </div>
+  )
+}
 const App = () => {
   const [persons, setPersons] = useState([]);
 
@@ -48,6 +59,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessageRed, setErrorMessageRed] = useState(null);
 
   const addName = (event) => {
     event.preventDefault();
@@ -68,14 +80,19 @@ const App = () => {
             setTimeout(() => {
               setErrorMessage(null)
             }, 5000)
-          setPersons(persons.concat(initialPersones));
 
             setPersons(persons.map(person => person.id !== existingPerson.id ? person : updatedPerson));
             setNewName('');
             setNewNumber('');
           })
           .catch(error => {
-            console.log('Error updating person:', error);
+            setErrorMessageRed(
+              `information of '${nameObject.name}' has already been removed from server`
+            )
+            setTimeout(() => {
+              setErrorMessageRed(null)
+            }, 5000)
+
           });
       }
     } else {
@@ -123,6 +140,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <NotificationRed message={errorMessageRed}/>
       <Notification message={errorMessage} />
       <Filter text={"filter shown with:"} value={searchTerm} change={handleSearchTerm}/>
       
