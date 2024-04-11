@@ -9,38 +9,47 @@ const Filter = ({ text, value, change }) => (
   </div>
 );
 
-const Countries = ({ countries }) => {
-  return (countries.length > 1)
-  ? (
-    <>
-    {countries.map(country => (
-    <div key={country.alpha3Code}>
+const Country = ({country,showCountryDetails}) => {
+
+  return (
+  <div>
     {country.name}
+    <button value={country.name} onClick={() => showCountryDetails(country)}>Show</button>
     </div>
-    ))}
-    </>
-
-
-  ) : (
-
-    <>
-    {countries.map(country => (
-      <div key={country.alpha3Code}>
-        <h1>{country.name}</h1>
-        <p>Capital: {country.capital}</p>
-        <p>Area: {country.area} sq. km</p>
-        <p><h3>Languages: </h3>
-          <ul>
-            {country.languages.map(language => (
-            <li>{(language.name)}</li>))}
-            </ul>
-        </p>
-        <img src={country.flag} alt={`${country.name} flag`} />
-      </div>
-    ))}
-  </>
-  )
+    )
 }
+
+const Countries = ({ countries, showCountryDetails }) => {
+  return countries.length > 1 ? (
+    <>
+      {countries.map(country => (
+        <div key={country.alpha3Code}>
+          <Country country={country} showCountryDetails={showCountryDetails} />
+        </div>
+      ))}
+    </>
+  ) : (
+    <>
+      {countries.map(country => (
+        <div key={country.alpha3Code}>
+          <h1>{country.name}</h1>
+          <p>Capital: {country.capital}</p>
+          <p>Area: {country.area} sq. km</p>
+          <div>
+            <h3>Languages:</h3>
+            <ul>
+              {country.languages.map(language => (
+                <li key={language.name}>{language.name}</li>
+              ))}
+            </ul>
+          </div>
+          <img src={country.flag} alt={`${country.name} flag`} />
+        </div>
+      ))}
+    </>
+  );
+};
+
 
 function App() {
   const [countries, setCountries] = useState([]);
@@ -52,6 +61,7 @@ function App() {
     setSearchTerm(event.target.value);
     searchCountry(event.target.value);
   }
+
 
 
   const searchCountry = (value) => {
@@ -82,13 +92,15 @@ function App() {
     })      
 
   }
-
+  const showCountryDetails = (country) => {
+    setCountries([country]);
+  };
 
   return (
     <>
     <Filter text={"find countries"} value={searchTerm} change={handleSearchTerm}/>
     {errorMessage && <p>{errorMessage}</p>}
-    <Countries countries={countries}/>
+    <Countries countries={countries} showCountryDetails={showCountryDetails}/>
     </>
   )
 }
