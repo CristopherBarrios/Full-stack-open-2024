@@ -1,29 +1,4 @@
-/* App.css */
-.App {
-    text-align: center;
-    font-family: Arial, sans-serif;
-  }
-  
-  h1 {
-    margin-top: 20px;
-  }
-  
-  input[type="text"], button {
-    margin: 10px;
-    padding: 10px;
-  }
-  
-  .error-message {
-    color: red;
-  }
-  
-  .country-info {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .country {
+ .country {
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
@@ -37,9 +12,5 @@
     max-width: 100px;
     max-height: 100px;
     margin-right: 20px;
-  }
-  
-  .country-details {
-    text-align: left;
   }
   
