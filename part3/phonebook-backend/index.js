@@ -25,6 +25,8 @@ let persons = [
 
 ]
 
+app.use(express.json())
+
 
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
@@ -62,6 +64,34 @@ app.get('/', (request, response) => {
     const numberOfPersons = persons.length;
     response.send(`<p>Phonebook has info for ${numberOfPersons} people</p><p>${date}</p>`);
 });
+
+// const generateId = () => {
+//   const maxId = persons.length > 0
+//     ? Math.max(...persons.map(n => n.id))
+//     : 0
+//   return maxId + 1
+// }
+
+app.post('/api/persons', (request, response) => {
+  const body = request.body
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'name or number is missing' 
+    })
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: Math.floor(Math.random() * 10000),
+    // id: generateId(),
+  }
+
+  persons = persons.concat(person)
+
+  response.json(person)
+})
 
 
   const PORT = 3001
