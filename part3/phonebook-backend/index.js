@@ -5,30 +5,6 @@ const morgan = require('morgan');
 const cors = require('cors')
 const Person = require('./models/person')
 
-
-let persons = [
-  { 
-    "id": 1,
-    "name": "Arto Hellas", 
-    "number": "040-123456"
-  },
-  { 
-    "id": 2,
-    "name": "Ada Lovelace", 
-    "number": "39-44-5323523"
-  },
-  { 
-    "id": 3,
-    "name": "Dan Abramov", 
-    "number": "12-43-234345"
-  },
-  { 
-    "id": 4,
-    "name": "Mary Poppendieck", 
-    "number": "39-23-6423122"
-  }
-]
-
 app.use(cors())
 app.use(express.json());
 
@@ -52,27 +28,37 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  const id = request.params.id;
+  Person.findById(id)
+    .then(person => {
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch(error => next(error));
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id !== id)
-  response.status(204).end();
+  Person.deleteOne({ _id: request.params.id })
+    .then((result) => {
+      if (result.deletedCount === 0) {
+        response.status(404).json({ errorMessage: 'Person no longer exists' })
+      } else {
+        response.status(204).end()
+      }
+    })
+    .catch((error) => next(error))
 })
 
 app.get('/info', (request, response) => {
   const date = new Date();
-  const numberOfPersons = persons.length;
-  response.send(`<p>Phonebook has info for ${numberOfPersons} people</p><p>${date}</p>`);
+  Person.countDocuments({}, (err, count) => {
+    response.send(`<p>Phonebook has info for ${count} people</p><p>${date}</p>`);
+  });
 })
+
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
@@ -92,6 +78,7 @@ app.post('/api/persons', (request, response) => {
   newPerson.save().then(savedPerson => {
     response.json(savedPerson)
   })
+  .catch(error => next(error));
 })
 
 const PORT = process.env.PORT
