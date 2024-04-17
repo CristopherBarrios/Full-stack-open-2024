@@ -27,7 +27,7 @@ app.get('/api/persons', (request, response) => {
   })
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id;
   Person.findById(id)
     .then(person => {
@@ -40,7 +40,7 @@ app.get('/api/persons/:id', (request, response) => {
     .catch(error => next(error));
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.deleteOne({ _id: request.params.id })
     .then((result) => {
       if (result.deletedCount === 0) {
@@ -60,7 +60,7 @@ app.get('/info', (request, response) => {
 })
 
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
   if (!body.name || !body.number) {
@@ -80,6 +80,22 @@ app.post('/api/persons', (request, response) => {
   })
   .catch(error => next(error));
 })
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'malformatted id' });
+  }
+
+  if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
