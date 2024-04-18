@@ -65,6 +65,14 @@ const App = () => {
     event.preventDefault();
     const nameObject = {  name: newName, number: newNumber, id: (persons.length + 1).toString() };
 
+    if (!newName || !newNumber) {
+      setErrorMessageRed("Name or number is missing");
+      setTimeout(() => {
+        setErrorMessageRed(null);
+      }, 5000);
+      return;
+    }
+    
     if (persons.some((person) => person.name === newName)) {
       
       if(window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)){
@@ -107,6 +115,16 @@ const App = () => {
         }, 5000)
       setPersons(persons.concat(initialPersones));
       })
+      .catch(error => {
+        if (error.response && error.response.data && error.response.data.error) {
+          setErrorMessageRed(error.response.data.error);
+        } else {
+          setErrorMessageRed("Error adding person");
+        }
+        setTimeout(() => {
+          setErrorMessageRed(null);
+        }, 5000);
+      });
       // setPersons(persons.concat(nameObject));
       setNewName('');
       setNewNumber('');
