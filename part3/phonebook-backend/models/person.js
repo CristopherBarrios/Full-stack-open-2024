@@ -18,7 +18,17 @@ mongoose.connect(url)
       minlength: 3,
       required: true
     },
-    number: String,
+    number: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function(value) {
+          const regex = /^\d{2,3}-\d+$/; 
+          return regex.test(value);
+        },
+        message: props => `${props.value} no es un número de teléfono válido. Debe tener una longitud de 8 o más caracteres y seguir el formato xx-xxxxxxx o xxx-xxxxxxx.`
+      }
+    }
   });
   personSchema.set('toJSON', {
     transform: (document, returnedObject) => {
