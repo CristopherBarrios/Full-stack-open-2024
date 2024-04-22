@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs/
 content-type: application/json
 
 {
-    "title": "MMMMaaaMMMaa",
-    "author": "Carlitos",
-    "url": "hola.com",
-    "likes": 4
+    "title": "El asalto del cielo",
+    "author": "Louis de Whol",
+    "url": "whol.com",
+    "likes": 1000
 }
