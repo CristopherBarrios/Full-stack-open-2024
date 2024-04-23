@@ -27,30 +27,58 @@ const dummy = (blogs) => {
 
 
 
-const mostBlogs = (blogs) => {
-  const groupedByAuthor = _.groupBy(blogs, 'author');
-  let maxBlogs = 0;
-  let mostBlogsAuthor = '';
+  const mostBlogs = (blogs) => {
+    if (blogs.length === 0) return null;
+  
+    const groupedByAuthor = _.groupBy(blogs, 'author');
+    let maxBlogs = 0;
+    let mostBlogsAuthor = '';
+  
+    for (const author in groupedByAuthor) {
+      const numBlogs = groupedByAuthor[author].length;
+      if (numBlogs > maxBlogs) {
+        maxBlogs = numBlogs;
+        mostBlogsAuthor = author;
+      }
+    }
+  
+    return {
+      author: mostBlogsAuthor,
+      blogs: maxBlogs
+    };
+  }
 
-  for (const author in groupedByAuthor) {
-    const numBlogs = groupedByAuthor[author].length;
-    if (numBlogs > maxBlogs) {
-      maxBlogs = numBlogs;
-      mostBlogsAuthor = author;
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) return null;
+
+  const likesByAuthor = {};
+
+  blogs.forEach(blog => {
+    if (likesByAuthor[blog.author]) {
+      likesByAuthor[blog.author] += blog.likes;
+    } else {
+      likesByAuthor[blog.author] = blog.likes;
+    }
+  });
+
+
+  let mostLikedAuthor = '';
+  let maxLikes = 0;
+  for (const author in likesByAuthor) {
+    if (likesByAuthor[author] > maxLikes) {
+      mostLikedAuthor = author;
+      maxLikes = likesByAuthor[author];
     }
   }
 
-  return {
-    author: mostBlogsAuthor,
-    blogs: maxBlogs
-  };
-}
-
+  return { author: mostLikedAuthor, likes: maxLikes };
+};
 
  
   module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
   }
