@@ -87,6 +87,31 @@ test('responds with 400 Bad Request if title or url are missing', async () => {
     .expect(400)
 })
 
+test('deleting a blog post', async () => {
+  const newBlog = new Blog({
+    title: 'Test Blog',
+    author: 'Test Author',
+    url: 'http://example.com',
+    likes: 10
+  })
+
+  await newBlog.save()
+
+  const initialBlogs = await Blog.find({})
+  const initialBlogCount = initialBlogs.length
+
+  const blogToDelete = initialBlogs[initialBlogs.length - 1]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAfterDelete = await Blog.find({})
+  const blogCountAfterDelete = blogsAfterDelete.length
+  
+  assert.strictEqual(blogCountAfterDelete, initialBlogCount - 1)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
