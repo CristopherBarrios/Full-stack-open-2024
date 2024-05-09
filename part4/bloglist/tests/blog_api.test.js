@@ -108,8 +108,33 @@ test('deleting a blog post', async () => {
 
   const blogsAfterDelete = await Blog.find({})
   const blogCountAfterDelete = blogsAfterDelete.length
-  
+
   assert.strictEqual(blogCountAfterDelete, initialBlogCount - 1)
+})
+
+test('updating a blog post', async () => {
+  const newBlog = new Blog({
+    title: 'Test Blog',
+    author: 'Test Author',
+    url: 'http://example.com',
+    likes: 10
+  })
+
+  await newBlog.save()
+
+  const blogToUpdate = await Blog.findOne({ title: 'Test Blog' })
+
+  const updatedBlogData = {
+    likes: 20
+  }
+
+  const response = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlogData)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  assert.strictEqual(response.body.likes, 20)
 })
 
 after(async () => {
