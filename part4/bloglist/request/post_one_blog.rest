@@ -2,8 +2,8 @@ POST http://localhost:3003/api/blogs/
 content-type: application/json
 
 {
-    "title": "El asalto del cielo",
-    "author": "Louis de Whol",
-    "url": "whol.com",
-    "likes": 1000
+    "title": "El probador de juanito",
+    "author": "El juanit pues",
+    "url": "juan.com",
+    "likes": 1010
 }
