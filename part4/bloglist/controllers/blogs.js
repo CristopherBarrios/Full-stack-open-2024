@@ -2,6 +2,7 @@ const blogsRouter  = require('express').Router()
 const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const middleware = require('../utils/middleware');
 
 
 
@@ -10,20 +11,14 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs)
   })
   
-  blogsRouter.post('/', async (request, response) => {
+  blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     const body = request.body
 
     if (!body.title || !body.url) {
       return response.status(400).json({ error: 'title or url missing' })
     }
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-    const user = await User.findById(decodedToken.id)
-  
-user
+    const user = request.user; 
 
     const blog = new Blog({
       ...body,
@@ -34,12 +29,11 @@ user
   })
 
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
   const blogId = request.params.id;
-  const token = request.token;
-  const decodedToken = jwt.verify(token, process.env.SECRET);
+  const user = request.user; 
 
-  if (!token || !decodedToken.id) {
+  if (!request.token || !user.id) {
     return response.status(401).json({ error: 'Unauthorized: Token missing or invalid' });
   }
 
@@ -49,7 +43,7 @@ blogsRouter.delete('/:id', async (request, response) => {
     return response.status(404).json({ error: 'Blog not found' });
   }
 
-  if (blog.user.toString() !== decodedToken.id) {
+  if (blog.user.toString() !== user._id.toString()) {
     return response.status(403).json({ error: 'Forbidden: You are not the creator of this blog' });
   }
 

@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs/
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkphamphamEiLCJpZCI6IjY2NDI3NjQ5YmMwMTFjNmM3ZTc1ZDdjOSIsImlhdCI6MTcxNTY0MzA1NX0.kcaPPKmx2npA8qkRNdzJdRH5clN85lwxm8WtBDre-88
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkphamphamEiLCJpZCI6IjY2NDI3NjQ5YmMwMTFjNmM3ZTc1ZDdjOSIsImlhdCI6MTcxNTcwODEzMH0.lOU_1JV6xHpaA-ErSe6bCUNKGzUs3fUFIGYnAgRfWY0
 
 {
-    "title": "El probador de para el 4.algo",
-    "author": "El algo pues",
-    "url": "a.go4.com",
+    "title": "El probador de para el 5.algo",
+    "author": "El 5 pues",
+    "url": "5.com",
     "likes": 1010
 }
