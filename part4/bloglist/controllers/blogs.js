@@ -35,11 +35,26 @@ user
 
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const id = request.params.id
-  
-  await Blog.findOneAndDelete(id)
-  
-  response.status(204).end()
+  const blogId = request.params.id;
+  const token = request.token;
+  const decodedToken = jwt.verify(token, process.env.SECRET);
+
+  if (!token || !decodedToken.id) {
+    return response.status(401).json({ error: 'Unauthorized: Token missing or invalid' });
+  }
+
+  const blog = await Blog.findById(blogId);
+
+  if (!blog) {
+    return response.status(404).json({ error: 'Blog not found' });
+  }
+
+  if (blog.user.toString() !== decodedToken.id) {
+    return response.status(403).json({ error: 'Forbidden: You are not the creator of this blog' });
+  }
+
+  await Blog.findOneAndDelete({ _id: blogId });
+  response.status(204).end();
 })
 
 blogsRouter.put('/:id', async (request, response) => {
