@@ -4,6 +4,8 @@ const supertest = require('supertest')
 const assert = require('node:assert')
 const app = require('../app')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
 
 const User = require('../models/user')
 const Blog = require('../models/blog')
@@ -11,15 +13,37 @@ const helper = require('./test_helper');
 
 const api = supertest(app)
 
+
+let token = '';
+
+beforeEach(async () => {
+
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+
+  await user.save()
+
+  const response = await await api.post('/api/login/').send({
+    username: 'root',
+    password: 'sekret'
+  });
+  token = response.body.token;
+  // console.log(token);
+});
+
 test('notes are returned as json', async () => {
+
   await api
-    .get('/api/blogs')
+    .get('/api/blogs')    
+    .set('Authorization', `Bearer ${token}`)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 })
 
 test('blogs have property id instead of _id', async () => {
-  const response = await api.get('/api/blogs')
+  const response = await api.get('/api/blogs').set('Authorization', `Bearer ${token}`)
 
   response.body.forEach(blog => {
     assert.ok(blog.id)
@@ -40,6 +64,7 @@ test('creating a new blog post', async () => {
 
   const response = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -62,6 +87,7 @@ test('default likes value is 0 if not provided', async () => {
 
   const response = await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlogWithoutLikes)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -82,21 +108,27 @@ test('responds with 400 Bad Request if title or url are missing', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlogWithoutTitle)
     .expect(400)
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlogWithoutUrl)
     .expect(400)
 })
 
 test('deleting a blog post', async () => {
+
+  const decodedToken = jwt.verify(token, process.env.SECRET); 
+
   const newBlog = new Blog({
     title: 'Test Blog',
     author: 'Test Author',
     url: 'http://example.com',
-    likes: 10
+    likes: 10,
+    user: decodedToken.id 
   })
 
   await newBlog.save()
@@ -108,6 +140,7 @@ test('deleting a blog post', async () => {
 
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .expect(204)
 
   const blogsAfterDelete = await Blog.find({})
@@ -134,6 +167,7 @@ test('updating a blog post', async () => {
 
   const response = await api
     .put(`/api/blogs/${blogToUpdate.id}`)
+    .set('Authorization', `Bearer ${token}`)
     .send(updatedBlogData)
     .expect(200)
     .expect('Content-Type', /application\/json/)
@@ -163,6 +197,7 @@ describe('when there is initially one user at db', () => {
 
     await api
       .post('/api/users')
+      .set('Authorization', `Bearer ${token}`)
       .send(newUser)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -185,6 +220,7 @@ describe('when there is initially one user at db', () => {
 
     const result = await api
       .post('/api/users')
+      .set('Authorization', `Bearer ${token}`)
       .send(newUser)
       .expect(400)
       .expect('Content-Type', /application\/json/)
@@ -194,6 +230,20 @@ describe('when there is initially one user at db', () => {
     assert(result.body.error.includes('Username already exists'))
 
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('responds with 401 Unauthorized if token is missing when creating a new blog post', async () => {
+    const newBlog = {
+      title: 'Test Blog',
+      author: 'Test Author',
+      url: 'http://example.com',
+      likes: 10
+    }
+  
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
   })
 })
 
